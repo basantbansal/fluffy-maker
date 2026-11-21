@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>もちほっぺ・メーカー</title>
+    <meta name="description" content="すきな画像のほっぺを、もちもち引っぱって遊べるおもちゃ" />
+    <meta property="og:title" content="もちほっぺ・メーカー" />
+    <meta property="og:description" content="すきな画像のほっぺを、もちもち引っぱって遊べるおもちゃ" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><circle cx=%2232%22 cy=%2234%22 r=%2226%22 fill=%22%23ffd7e0%22/><circle cx=%2221%22 cy=%2239%22 r=%227%22 fill=%22%23ff8fab%22/><circle cx=%2243%22 cy=%2239%22 r=%227%22 fill=%22%23ff8fab%22/></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/index-Xm--8XAs.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BQJus2d-.css">
+  </head>
+  <body data-mode="empty">
+    <div id="app">
+      <header class="header">
+        <h1 class="logo">もちほっぺ・メーカー</h1>
+        <nav class="steps" aria-label="手順">
+          <button class="step" id="stepLoad"><span class="step-num">1</span>いれる</button>
+          <span class="step-arrow">▸</span>
+          <button class="step" id="stepPaint" disabled><span class="step-num">2</span>ぬる</button>
+          <span class="step-arrow">▸</span>
+          <button class="step" id="stepPlay" disabled><span class="step-num">3</span>あそぶ</button>
+        </nav>
+      </header>
+
+      <main class="stage" id="stage">
+        <!-- Fluffy Maker Desktop Overlay Controls -->
+        <button class="fluffy-close-btn" id="fluffyBtnClose" title="Close (Esc)" aria-label="Close" hidden>✕</button>
+
+        <nav class="fluffy-pill" id="fluffyPill" hidden aria-label="Controls">
+          <button class="fluffy-pill-btn active" id="fluffyBtnPaint" title="Paint Mask (P / 1)">
+            <span class="fluffy-pill-icon">🖌️</span>
+            <span class="fluffy-pill-label">Paint</span>
+          </button>
+          <div class="fluffy-pill-slider-wrap" title="Brush Size (Scroll wheel to adjust)">
+            <input type="range" class="fluffy-pill-slider" id="fluffyBrushSize" min="0.01" max="0.25" step="0.005" value="0.07" title="Brush Size" />
+          </div>
+          <button class="fluffy-pill-btn fluffy-pill-btn-play" id="fluffyBtnPlay" title="Squish Cheeks! (Space / S / 2)">
+            <span class="fluffy-pill-icon">✨</span>
+            <span class="fluffy-pill-label">Play!</span>
+          </button>
+        </nav>
+
+        <canvas id="gl"></canvas>
+        <div id="brushCursor" class="brush-cursor" hidden></div>
+        <div id="brushPreview" class="brush-preview" hidden></div>
+        <button class="tool-btn view-reset" id="btnResetView" hidden>
+          <span class="tool-ico">
+            <svg viewBox="0 0 24 24">
+              <path d="M2.5 4.5v6H8.5" />
+              <path d="M4.5 15a8 8 0 1 0 1.9-8.4L2.5 10.5" />
+            </svg>
+          </span>
+          <span class="tool-label">表示リセット</span>
+        </button>
+
+        <!-- ① 空状態 -->
+        <div class="empty-state" id="emptyState">
+          <div class="dropcard">
+            <div class="dropcard-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M20.4 16.6A5 5 0 0 0 18 7.1 8 8 0 1 0 3.1 15.2" />
+                <path d="M12 12v9" />
+                <path d="M8.5 15.5L12 12l3.5 3.5" />
+              </svg>
+            </div>
+            <p class="dropcard-title">画像をここにドロップ</p>
+            <p class="dropcard-sub">ファイル選択・ペースト（Ctrl+V）でもOK</p>
+            <div class="dropcard-actions">
+              <button class="btn btn-primary" id="btnPick">画像をえらぶ</button>
+              <button class="btn btn-ghost" id="btnSample">サンプルであそぶ</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ② ぬりぬりモード -->
+        <div class="paint-ui" id="paintUi" hidden>
+          <div class="hint" id="paintHint">もちもちにしたいところを ぬってね（二本指で かくだい・いどう）</div>
+          <div class="paint-bar">
+            <button class="tool-btn active" id="btnBrush" title="ブラシ">
+              <span class="tool-ico">
+                <svg viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" /></svg>
+              </span>
+              <span class="tool-label">ブラシ</span>
+            </button>
+            <button class="tool-btn" id="btnEraser" title="消しゴム">
+              <span class="tool-ico">
+                <svg viewBox="0 0 24 24">
+                  <path d="M10 5l9 9-5 5H9l-5-5z" />
+                  <line x1="4" y1="20" x2="20" y2="20" />
+                </svg>
+              </span>
+              <span class="tool-label">消しゴム</span>
+            </button>
+            <div class="seg" id="brushType" title="ブラシの種類">
+              <button data-type="hard" class="active">くっきり</button>
+              <button data-type="soft">ふんわり</button>
+            </div>
+            <label class="brush-size">
+              <span class="tool-label">ふとさ</span>
+              <input type="range" id="brushSize" min="0.01" max="0.20" step="0.0025" value="0.07" title="ブラシの大きさ" />
+            </label>
+            <button class="tool-btn" id="btnClearMask" title="ぜんぶ消す">
+              <span class="tool-ico">
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6" />
+                  <path d="M18.5 6l-.8 13a2 2 0 0 1-2 1.9H8.3a2 2 0 0 1-2-1.9L5.5 6" />
+                </svg>
+              </span>
+              <span class="tool-label">ぜんぶ消す</span>
+            </button>
+            <span class="paint-sep"></span>
+            <button class="btn btn-ghost" id="btnAllMochi">ぜんぶもちもち</button>
+            <button class="btn btn-primary" id="btnPlay">あそぶ！</button>
+          </div>
+        </div>
+
+        <!-- ③ あそぶモード -->
+        <div class="toolbar" id="toolbar" hidden>
+          <button class="tool-btn" id="btnChangeImage" title="画像をかえる">
+            <span class="tool-ico">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="4" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="M21 15.5l-5-5L5.5 21" />
+              </svg>
+            </span>
+            <span class="tool-label">画像</span>
+          </button>
+          <button class="tool-btn" id="btnRepaint" title="ほっぺをぬりなおす">
+            <span class="tool-ico">
+              <svg viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" /></svg>
+            </span>
+            <span class="tool-label">ぬりなおす</span>
+          </button>
+          <button class="tool-btn" id="btnSound" title="効果音">
+            <span class="tool-ico">
+              <svg class="ico-on" viewBox="0 0 24 24">
+                <path d="M11 5L6 9H2.5v6H6l5 4z" />
+                <path d="M15 8.5a5 5 0 0 1 0 7" />
+                <path d="M18 5.5a9.5 9.5 0 0 1 0 13" />
+              </svg>
+              <svg class="ico-off" viewBox="0 0 24 24">
+                <path d="M11 5L6 9H2.5v6H6l5 4z" />
+                <line x1="16" y1="9.5" x2="21" y2="14.5" />
+                <line x1="21" y1="9.5" x2="16" y2="14.5" />
+              </svg>
+            </span>
+            <span class="tool-label">おと</span>
+          </button>
+          <button class="tool-btn" id="btnRecord" title="録画">
+            <span class="tool-ico">
+              <svg class="fill ico-on" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" /></svg>
+              <svg class="fill ico-off" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2.5" /></svg>
+            </span>
+            <span class="tool-label">録画</span>
+          </button>
+          <button class="tool-btn" id="btnOptions" title="せってい">
+            <span class="tool-ico">
+              <svg viewBox="0 0 24 24">
+                <line x1="5" y1="3" x2="5" y2="10" />
+                <line x1="5" y1="14" x2="5" y2="21" />
+                <circle cx="5" cy="12" r="2" />
+                <line x1="12" y1="3" x2="12" y2="6" />
+                <line x1="12" y1="10" x2="12" y2="21" />
+                <circle cx="12" cy="8" r="2" />
+                <line x1="19" y1="3" x2="19" y2="13" />
+                <line x1="19" y1="17" x2="19" y2="21" />
+                <circle cx="19" cy="15" r="2" />
+              </svg>
+            </span>
+            <span class="tool-label">せってい</span>
+          </button>
+        </div>
+
+        <div class="drop-overlay" id="dropOverlay" hidden><div class="drop-overlay-text">ここにドロップ！</div></div>
+        <div class="toast-area" id="toastArea"></div>
+        <div class="fps" id="fps" hidden></div>
+      </main>
+
+      <!-- せっていパネル -->
+      <div class="panel-backdrop" id="panelBackdrop" hidden></div>
+      <aside class="panel" id="panel" hidden aria-label="せってい">
+        <div class="panel-head">
+          <h2>せってい</h2>
+          <button class="tool-btn" id="btnClosePanel" aria-label="とじる">✕</button>
+        </div>
+        <section class="panel-sec">
+          <h3>もちもち加減</h3>
+          <label class="slider-row">
+            <span>やわらかさ</span>
+            <input type="range" id="pSoftness" min="0" max="1" step="0.01" value="0.5" />
+          </label>
+          <details class="panel-details">
+            <summary>こまかい調整</summary>
+            <label class="slider-row">
+              <span>つまみ範囲</span>
+              <input type="range" id="pRadius" min="0.08" max="0.40" step="0.005" value="0.22" />
+            </label>
+            <label class="slider-row">
+              <span>のびる量</span>
+              <input type="range" id="pStretch" min="0.30" max="1.00" step="0.01" value="0.55" />
+            </label>
+            <label class="slider-row">
+              <span>ゆれの速さ</span>
+              <input type="range" id="pFreq" min="6" max="13" step="0.1" value="9" />
+            </label>
+            <label class="slider-row">
+              <span>ゆれの回数</span>
+              <input type="range" id="pWobble" min="0" max="1" step="0.01" value="0.55" />
+            </label>
+            <label class="slider-row">
+              <span>ぷっくり</span>
+              <input type="range" id="pBulge" min="0" max="0.25" step="0.005" value="0.10" />
+            </label>
+          </details>
+          <button class="btn btn-ghost btn-small" id="btnResetParams">おまかせに戻す</button>
+        </section>
+        <section class="panel-sec">
+          <h3>おと</h3>
+          <label class="slider-row">
+            <span>音量</span>
+            <input type="range" id="pVolume" min="0" max="1" step="0.01" value="0.7" />
+          </label>
+        </section>
+        <section class="panel-sec">
+          <h3>録画</h3>
+          <div class="seg" id="recFormat">
+            <button data-fmt="video" class="active">動画</button>
+            <button data-fmt="gif">GIF</button>
+          </div>
+          <p class="note">GIFは最長6秒・すこし粗めになります</p>
+        </section>
+      </aside>
+
+      <!-- WebGL2非対応 -->
+      <div class="fatal-card" id="fatalCard" hidden>
+        <div class="dropcard">
+          <p class="dropcard-title">このブラウザでは あそべません</p>
+          <p class="dropcard-sub">WebGL2に対応したブラウザ（Chrome / Edge / Safari / Firefoxの新しめのもの）でひらいてね</p>
+        </div>
+      </div>
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*" hidden />
+  </body>
+</html>
