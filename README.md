@@ -22,11 +22,6 @@
   <p><i>Capture a screen region, paint the squishy mask, and pull cheeks with interactive spring physics.</i></p>
 </div>
 
-> **Note**: To showcase your rice recording, record your screen with `wl-screenrec` or `gpu-screen-recorder`, convert to GIF, and save as `demo.gif` in the repository root:
-> ```bash
-> ffmpeg -i recording.mp4 -vf "fps=30,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 demo.gif
-> ```
-
 ---
 
 ## ✨ Features
