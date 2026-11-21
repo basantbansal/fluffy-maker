@@ -37,46 +37,72 @@
 
 ## ⚡ Quick Install & Setup
 
-### 1. Install System Dependencies
+### Automatic Install (Recommended)
 
-On Arch Linux / CachyOS / EndeavourOS:
+Run the automated installer to check dependencies, symlink the binary to `~/.local/bin/fluffy-maker`, and configure your Hyprland keybind:
 
 ```bash
-sudo pacman -S slurp grim python-gobject webkit2gtk-4.1
+git clone https://github.com/basantbansal/fluffy-maker.git && cd fluffy-maker && ./install.sh
 ```
 
-*(Node.js and npm are only needed if modifying and rebuilding `engine/`).*
+---
 
-### 2. Clone Repository
+### Manual Setup
+
+#### 1. Install System Dependencies
+
+- **Arch Linux / CachyOS / EndeavourOS**:
+  ```bash
+  sudo pacman -S grim slurp python-gobject webkit2gtk-4.1
+  ```
+- **Fedora**:
+  ```bash
+  sudo dnf install grim slurp python3-gobject webkit2gtk4.1
+  ```
+- **Ubuntu / Debian**:
+  ```bash
+  sudo apt install grim slurp python3-gi gir1.2-webkit2-4.1
+  ```
+
+#### 2. Clone & Link
 
 ```bash
 git clone https://github.com/basantbansal/fluffy-maker.git
 cd fluffy-maker
-chmod +x fluffy-maker.sh wrapper.py
+chmod +x fluffy-maker.sh wrapper.py install.sh
+mkdir -p ~/.local/bin && ln -sf "$PWD/fluffy-maker.sh" ~/.local/bin/fluffy-maker
 ```
 
-*(Production WebGL assets in `engine/dist` are already pre-built and ready to run immediately).*
+*(Production WebGL assets in `engine/dist` are pre-compiled and run directly).*
 
-### 3. Add to Hyprland Config
+#### 3. Add to Hyprland Config
 
-Add the trigger keybind to `~/.config/hypr/UserConfigs/UserKeybinds.conf`:
+Add the trigger keybinding to `~/.config/hypr/hyprland.conf` (or `~/.config/hypr/UserConfigs/UserKeybinds.conf`):
 
 ```hyprlang
 # Fluffy Maker interactive squishy overlay (SUPER + F)
-bindd = $mainMod, F, Fluffy Maker squishy overlay, exec, /path/to/fluffy-maker/fluffy-maker.sh
+bind = SUPER, F, exec, fluffy-maker
 ```
 
-Add the window rules to `~/.config/hypr/UserConfigs/WindowRules.conf` (Hyprland 0.53+):
+Add the window rules to `~/.config/hypr/hyprland.conf` (or `~/.config/hypr/UserConfigs/WindowRules.conf`):
 
+**For Hyprland >= 0.53:**
 ```hyprlang
-# Fluffy Maker Interactive Overlay
 windowrule = match:class ^(fluffy-maker)$, float on
 windowrule = match:class ^(fluffy-maker)$, border_size 0
 windowrule = match:class ^(fluffy-maker)$, no_blur on
 windowrule = match:class ^(fluffy-maker)$, no_shadow on
 ```
 
-Reload Hyprland:
+**For older Hyprland (< 0.53):**
+```hyprlang
+windowrulev2 = float, class:^(fluffy-maker)$
+windowrulev2 = noborder, class:^(fluffy-maker)$
+windowrulev2 = noblur, class:^(fluffy-maker)$
+windowrulev2 = noshadow, class:^(fluffy-maker)$
+```
+
+#### 4. Reload Hyprland
 
 ```bash
 hyprctl reload
@@ -102,6 +128,7 @@ hyprctl reload
 
 ```
 fluffy-maker/
+├── install.sh          # Interactive installer (dependencies, symlink, keybinds)
 ├── fluffy-maker.sh     # Self-contained launcher (duplicate prevention, slurp + grim)
 ├── wrapper.py          # Native GTK3/WebKit2 transparent Wayland wrapper
 ├── engine/             # Adapted WebGL2 squishy engine (Vite + TypeScript)

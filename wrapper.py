@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 """
 Fluffy Maker - Lightweight Desktop Overlay Wrapper
 Using system WebKit2GTK (4.1) on Wayland/Hyprland.
