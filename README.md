@@ -1,47 +1,77 @@
+<div align="center">
+
 # 🥟 Fluffy Maker
 
-> **Interactive squishy cheek physics overlay for Hyprland (Wayland)**  
-> Capture any character, avatar, or anime girl on your screen and stretch, pinch, and wobble their cheeks in real-time with WebGL2 physics and sound effects.
+**Interactive WebGL2 squishy cheek physics screen overlay for Hyprland (Wayland)**
 
-Adapted from the squishy cheek engine created by [@saba383810](https://github.com/saba383810) ([moti_hoppe_maker](https://github.com/saba383810/moti_hoppe_maker)).
+[![Hyprland](https://img.shields.io/badge/Hyprland-Wayland-00B4D8?style=flat-square&logo=wayland&logoColor=white)](https://github.com/hyprwm/Hyprland)
+[![Arch Linux](https://img.shields.io/badge/Arch_Linux-Compatible-1793D1?style=flat-square&logo=arch-linux&logoColor=white)](https://archlinux.org)
+[![WebGL2](https://img.shields.io/badge/WebGL2-Hardware_Accelerated-990000?style=flat-square&logo=webgl&logoColor=white)](https://www.khronos.org/webgl/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
+
+*Select any character, avatar, or anime wallpaper on your desktop and pinch, stretch, and wobble their cheeks in real time with smooth spring physics and squishy WebAudio sound effects.*
+
+</div>
+
+---
+
+## 🎬 Demo
+
+<div align="center">
+  <img src="demo.gif" alt="Fluffy Maker Demo" width="85%" />
+  <p><i>Capture a screen region, paint the squishy mask, and pull cheeks with interactive spring physics.</i></p>
+</div>
+
+> **Note**: To showcase your rice recording, record your screen with `wl-screenrec` or `gpu-screen-recorder`, convert to GIF, and save as `demo.gif` in the repository root:
+> ```bash
+> ffmpeg -i recording.mp4 -vf "fps=30,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 demo.gif
+> ```
 
 ---
 
 ## ✨ Features
 
-- **Pixel-Perfect Screen Overlay**: Press `SUPER + F` and drag a rectangle with `slurp`. Fluffy Maker captures the region with `grim` and immediately spawns a borderless, floating overlay snapped exactly over the captured area.
-- **WebGL2 Squish Physics**: Spring dynamics, quintic falloff distortion, and synthetic WebAudio sound effects running at a smooth 60–144+ FPS.
-- **Ultra-Clean Pastel Aesthetic**: Minimal frosted-glass pill floating at the bottom with a 3-control layout (`Paint`, brush slider, and `Play!`).
-- **Showcase & Rice Ready (r/unixporn / r/hyprland)**: When in `Play!` mode, UI controls softly fade out (`opacity: 0.35`) so your screen recordings and rice showcases remain clean and unobstructed. Hovering reveals full opacity.
-- **Zero Launch Flash**: Transparent RGBA Cairo background and deferred WebKit commit rendering prevent any white flash on Wayland.
-- **Movable & Workspace-Bound**: Stays strictly on the workspace where captured. Move anytime via Hyprland's `SUPER + Left-Click-Drag` or simply **Right-Click-Drag** anywhere on the canvas.
+- **Instant Region Snapping**: Press `SUPER + F` and drag with `slurp`. Fluffy Maker captures the region with `grim` and immediately spawns a borderless floating overlay snapped 1:1 over your screen.
+- **WebGL2 Spring Dynamics**: Verlet integration, quintic smootherstep falloff deformation, dynamic volume preservation (bulge), and synthetic WebAudio sound effects running smoothly at 60–144+ FPS.
+- **Minimal Pastel Rice Aesthetic**: Sleek frosted-glass pill (`rgba(255, 255, 255, 0.88)` with background blur) featuring only 3 essential controls (`🖌️ Paint`, brush slider, and `✨ Play!`) plus a circular top-right close button.
+- **Showcase / Screen-Recording Mode**: In `Play!` mode, UI controls softly fade out (`opacity: 0.35`) so screen recordings and rices remain completely clean. Hovering reveals full opacity.
+- **Zero Launch Flash**: Transparent RGBA Cairo window surface and deferred WebKit frame commit prevent white flicker on Wayland.
+- **Workspace-Bound & Movable**: Stays strictly on the workspace where the screenshot was taken. Move the overlay window anytime via Hyprland's `SUPER + Left-Click-Drag` or **Right-Click-Drag** anywhere on the canvas.
 
 ---
 
-## 📦 Dependencies
+## ⚡ Quick Install & Setup
+
+### 1. Install System Dependencies
 
 On Arch Linux / CachyOS / EndeavourOS:
 
 ```bash
-sudo pacman -S grim slurp python-gobject webkit2gtk-4.1
+sudo pacman -S slurp grim python-gobject webkit2gtk-4.1
 ```
 
-*(Node.js and npm are only required if rebuilding the `engine/` web assets).*
+*(Node.js and npm are only needed if modifying and rebuilding `engine/`).*
 
----
+### 2. Clone Repository
 
-## 🚀 3-Step Hyprland Setup
+```bash
+git clone https://github.com/basantbansal/fluffy-maker.git
+cd fluffy-maker
+chmod +x fluffy-maker.sh wrapper.py
+```
 
-### 1. Keybinding
-Add this line to `~/.config/hypr/UserConfigs/UserKeybinds.conf`:
+*(Production WebGL assets in `engine/dist` are already pre-built and ready to run immediately).*
+
+### 3. Add to Hyprland Config
+
+Add the trigger keybind to `~/.config/hypr/UserConfigs/UserKeybinds.conf`:
 
 ```hyprlang
-# Fluffy Maker interactive squishy overlay (Super + F)
-bindd = $mainMod, F, Fluffy Maker squishy overlay, exec, /mnt/hdd/basant-data/Projects/Fluffy_maker/fluffy-maker.sh
+# Fluffy Maker interactive squishy overlay (SUPER + F)
+bindd = $mainMod, F, Fluffy Maker squishy overlay, exec, /path/to/fluffy-maker/fluffy-maker.sh
 ```
 
-### 2. Window Rules
-Add these rules to `~/.config/hypr/UserConfigs/WindowRules.conf`:
+Add the window rules to `~/.config/hypr/UserConfigs/WindowRules.conf` (Hyprland 0.53+):
 
 ```hyprlang
 # Fluffy Maker Interactive Overlay
@@ -51,23 +81,24 @@ windowrule = match:class ^(fluffy-maker)$, no_blur on
 windowrule = match:class ^(fluffy-maker)$, no_shadow on
 ```
 
-### 3. Reload Hyprland
+Reload Hyprland:
+
 ```bash
 hyprctl reload
 ```
 
 ---
 
-## 🎮 Controls & Shortcuts
+## 🎮 Controls
 
-| Action | Control |
+| Action | Input |
 |---|---|
 | **Trigger Fluffy Maker** | `SUPER + F` (click & drag area with mouse; `Esc` to cancel) |
 | **Paint Mask Mode** | `🖌️ Paint` button, or press `P` / `1` |
+| **Adjust Brush Size** | **Scroll mouse wheel** on canvas in Paint mode, use slider, or `[` / `]` |
 | **Squish / Play Mode** | `✨ Play!` button, or press `Space` / `S` / `2` |
-| **Resize Brush Circle** | **Scroll mouse wheel** on canvas in Paint mode, or use `[` / `]` |
-| **Squish & Pull Cheeks** | Left-Click-Drag on painted region in Play mode |
-| **Move Overlay Window** | **Right-Click-Drag** anywhere, or `SUPER + Left-Click-Drag` |
+| **Squish & Pull Cheeks** | Left-Click-Drag on painted character area in Play mode |
+| **Move Overlay Window** | **Right-Click-Drag** anywhere on canvas, or `SUPER + Left-Click-Drag` |
 | **Close Overlay** | Top-right `✕` button, or press `Escape` |
 
 ---
@@ -75,17 +106,18 @@ hyprctl reload
 ## 🛠️ Project Structure
 
 ```
-Fluffy_maker/
-├── fluffy-maker.sh     # Self-contained launcher script (prevents duplicates, slurp + grim)
+fluffy-maker/
+├── fluffy-maker.sh     # Self-contained launcher (duplicate prevention, slurp + grim)
 ├── wrapper.py          # Native GTK3/WebKit2 transparent Wayland wrapper
 ├── engine/             # Adapted WebGL2 squishy engine (Vite + TypeScript)
-│   ├── dist/           # Pre-built production client assets
-│   └── src/            # Physics, WebGL shaders, mask tools, and overlay UI
+│   ├── dist/           # Pre-compiled client assets (no Node.js needed at runtime)
+│   └── src/            # Physics, WebGL shaders, mask tool, and overlay UI
+├── demo.gif            # Showcase GIF
 ├── README.md           # Documentation
-└── .gitignore          # Clean repository rules
+└── LICENSE             # MIT License
 ```
 
-To modify and rebuild the engine:
+To modify and recompile the TypeScript engine:
 ```bash
 cd engine
 npm install
@@ -94,7 +126,7 @@ npm run build
 
 ---
 
-## 💖 Credits & Acknowledgements
+## 💖 Credits
 
-- **Physics & WebGL2 Engine**: Created by [@saba383810](https://github.com/saba383810) in [moti_hoppe_maker](https://github.com/saba383810/moti_hoppe_maker).
-- **Hyprland Wrapper**: Built with Python GTK3, WebKit2GTK 4.1, `slurp`, and `grim`.
+- **Original WebGL2 Squishy Physics Engine**: Created by [@saba383810](https://github.com/saba383810) in [moti_hoppe_maker](https://github.com/saba383810/moti_hoppe_maker).
+- **Hyprland Desktop Widget**: Built with Python GTK3, WebKit2GTK 4.1, `slurp`, and `grim`.
